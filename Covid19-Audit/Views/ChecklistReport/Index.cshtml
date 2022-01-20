@@ -1,0 +1,158 @@
+﻿@model Covid19_Audit.Viewmodel.Report.AuditReportViewModel
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+@{
+    ViewBag.Title = "Checklist Report";
+}
+
+<h2>Index</h2>
+
+<div class="container">
+    @using (@Ajax.BeginForm("ShowReport", "ChecklistReport", null
+, new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnShowSuccess" }))
+    {
+        <div class="form-group col-sm-2">
+            @Html.LabelFor(m => m.From, htmlAttributes: new { @class = "control-label col-md-12" })
+            <div class="col-md-11" style="padding:10px;">
+                @Html.EditorFor(m => m.From, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.From, "", new { @class = "text-danger" })
+
+            </div>
+        </div>
+        <div class="form-group col-sm-2">
+            @Html.LabelFor(m => m.To, htmlAttributes: new { @class = "control-label col-md-12" })
+            <div class="col-md-11" style="padding:10px;">
+                @Html.EditorFor(m => m.To, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.To, "", new { @class = "text-danger" })
+
+            </div>
+        </div>
+        <div class="form-group col-sm-2">
+            @Html.Label("Status", htmlAttributes: new { @class = "control-label col-md-12" })
+            <div class="col-md-11" style="padding:10px;">
+                @Html.DropDownListFor(x => x.Status, new List<SelectListItem>
+                    {
+                        new SelectListItem{ Text="All", Value = "" },
+                        new SelectListItem{ Text="Pass", Value = "Pass" },
+                        new SelectListItem{ Text="Fail", Value = "Fail" },
+                    }, new { @class = "form-control" })
+            </div>
+        </div>
+
+            <div class="form-group col-sm-3">
+                <br />
+                <div class="col-md-12" style="padding:10px;">
+                    <input type="submit" value="Show record" class="btn btn-success" style="margin-right:20px;" />
+                </div>
+            </div>
+            }
+
+
+
+            <div style="clear:both;"></div>
+
+            <div id="checklistList">
+
+                <table id="ChecklistGrid" class="table table-striped table-bordered" style="width:100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>TransactionId</th>
+                            <th>AuditDate</th>
+                            <th>Auditor</th>
+                            <th>AuditorPartner1</th>
+                            <th>AuditorPartner2</th>
+                            <th>Location</th>
+                            <th>AuditCode</th>
+                            <th>FocusArea</th>
+                            <th>AuditItem</th>
+                            <th>ResultView</th>
+                            <th>Category</th>
+                            <th>Remarks</th>
+                            <th>UploadedPicture</th>
+                        </tr>
+                    </thead>
+                </table>
+
+                <script>
+    $(document).ready(function () {
+    $("#ChecklistGrid").DataTable({
+        "processing": true, // for show progress bar
+        "serverSide": true, // for process server side
+        "filter": false, // this is for disable filter (search box)
+        "orderMulti": false, // for disable multiple column at once
+        "pageLength": 15,
+
+        "ajax": {
+            "url": "@Url.Action("LoadData", "ChecklistReport")",
+            "type": "POST",
+        },
+        columnDefs: [{
+            targets: 1 , render: function (data) {
+                return moment(data).format('DD MMMM YYYY');
+            }
+        },
+        {
+            targets: 0, visible: false
+        }],
+
+        "columns": [
+            { "data": "TransactionId", "name": "TransactionId", "autoWidth": true },
+            { "data": "AuditDate", "title" : "Date" , "name": "AuditDate", "autoWidth": true },
+            { "data": "Auditor", "name": "Auditor", "autoWidth": true },
+            { "data": "AuditorPartner1", "title": "Auditor Partner 1", "name": "AuditorPartner1", "autoWidth": true },
+            { "data": "AuditorPartner2", "title": "Auditor Partner 2", "name": "AuditorPartner2", "autoWidth": true },
+            { "data": "Location", "name": "Location", "autoWidth": true },
+            { "data": "AuditCode", "title": "Auditor Code", "name": "AuditCode", "autoWidth": true },
+            { "data": "FocusArea", "title": "Focus Area", "name": "FocusArea", "autoWidth": true },
+            { "data": "AuditItem", "title": "Audit Item", "name": "AuditItem", "autoWidth": true },
+            { "data": "ResultView", "title": "Result", "name": "ResultView", "autoWidth": true },
+            { "data": "Category", "name": "Category", "autoWidth": true },
+            { "data": "Remark", "name": "Remark", "autoWidth": true },
+            { "data": "UploadedPicture", "title": "Picture", "name": "UploadedPicture", "autoWidth": true },
+            ]
+        });
+    });
+
+                </script>
+            </div>
+            <script>
+                jQuery(function ($) {
+                    $(".fancybox").fancybox();
+                });
+
+                $(function () {
+                    $('#From').datetimepicker({
+                        format: 'LL'
+                    });
+                });
+
+                $(function () {
+                    $('#To').datetimepicker({
+                        format: 'LL'
+                    });
+                });
+
+                function OnShowSuccess(result) {
+                    if (result == null) {
+                        alert("Empty");
+                    } else {
+                        $('.field-validation-error')
+                            .removeClass('field-validation-error')
+                            .addClass('field-validation-valid');
+
+                        $('.input-validation-error')
+                            .removeClass('input-validation-error')
+                            .addClass('valid');
+
+
+                        window.scrollTo(0, document.body.scrollHeight);
+                        $("#checklistList").html(result);
+
+                    }
+                }
+            </script>
+        </div>

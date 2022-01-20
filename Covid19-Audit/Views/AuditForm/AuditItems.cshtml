@@ -1,0 +1,242 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .icheck-success > input:first-child:checked + input[type=hidden] + label::before, .icheck-success > input:first-child:checked + label::before {
+        background-color: rgba(71, 143, 124, 1);
+        border-color: rgba(71, 143, 124, 1);
+    }
+</style>
+
+
+<div class="container" style="padding-top: 70px;">
+    @model Covid19_Audit.Viewmodel.AuditFormViewModel
+
+    @using (Html.BeginForm("SubmitAudit", "AuditForm", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading" style="font-weight:bold;">Audit Information</div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email">Audit Date:</label>
+                            @Html.DisplayFor(m => m.AuditDate)
+                        </div>
+                        <div class="form-group">
+                            <label for="pwd">Audit Code:</label>
+                            @Html.DisplayFor(m => m.AuditCode)
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="pwd">Location:</label>
+                            @Html.DisplayFor(m => m.Location)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @Html.HiddenFor(m => m.AuditCode)
+        @Html.HiddenFor(m => m.AuditDate)
+        @Html.HiddenFor(m => m.Location)
+
+        <h4>Audit Checklists</h4>
+        <br />
+
+        <table style="width:100%" class="table">
+            <tr>
+                <th>No</th>
+                <th>Audit Items</th>
+                <th>Pass</th>
+                <th>Fail</th>
+                <th>Remark</th>
+                <th>Upload File (Max 3 MB)</th>
+            </tr>
+
+            @for (int j = 0; j < Model.AuditCheckList.Count(); j++)
+            {
+                <tr>
+                    <td></td>
+                    <td colspan="5">
+                        <b>@Model.AuditCheckList[j].ItemTitle</b>
+                        @Html.HiddenFor(m => m.AuditCheckList[j].ItemTitle)
+                        @Html.HiddenFor(m => m.AuditCheckList[j].ItemId)
+                    </td>
+                </tr>
+
+                for (int i = 0; i < Model.AuditCheckList[j].AuditItems.Count; i++)
+                {
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>
+                        @Html.Raw(@Model.AuditCheckList[j].AuditItems[i].QuestionText)
+                        @Html.HiddenFor(m => m.AuditCheckList[j].AuditItems[i].QuestionId)
+                        @Html.HiddenFor(m => m.AuditCheckList[j].AuditItems[i].QuestionText)
+                        @Html.HiddenFor(m => m.AuditCheckList[j].AuditItems[i].Category)
+                    </td>
+                    <td>
+                        <div class="icheck-success">
+                            @Html.RadioButtonFor(m => m.AuditCheckList[j].AuditItems[i].Result, true, new { id = "trueRad" + i + j, @class = "trueRadButton" })
+                            <label for="trueRad@(i.ToString() + j.ToString())"></label>
+                        </div>
+                    </td>
+                    <td>
+
+                        <div class="icheck-danger">
+                            @Html.RadioButtonFor(m => m.AuditCheckList[j].AuditItems[i].Result, false, new { id = "falseRad" + i + j, @class = "falseRadButton" })
+                            <label for="falseRad@(i.ToString() + j.ToString())"></label>
+                        </div>
+                    </td>
+                    <td> @Html.TextAreaFor(m => m.AuditCheckList[j].AuditItems[i].Remark, new { @class = "form-control remark", @rows = 2 , @style = "margin:0;" })</td>
+
+
+                    <td>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                @Html.TextBoxFor(m => m.AuditCheckList[j].AuditItems[i].PostedFiles,
+                               new {  type = "file" , accept = ".jpg, .jpeg, .png" , @multiple = "multiple", @class = "fileUpload"})
+
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            }
+
+        </table>
+
+        <h4>Feedbacks</h4>
+        <hr />
+        <div class="col-md-12 row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FeedbackCheckList.Area, htmlAttributes: new { @class = "control-label col-md-12" })
+                    <div class="col-md-11" style="padding:10px;">
+                        @Html.DropDownListFor(x => x.FeedbackCheckList.Area, new List<SelectListItem>
+                        {
+                            new SelectListItem() {Text="Hand wash", Value="Hand wash"},
+                            new SelectListItem() {Text="Locker", Value="Locker"},
+                            new SelectListItem() {Text="Canteen", Value="Canteen"},
+                            new SelectListItem() {Text="Coffee Corner", Value="Coffee Corner"},
+                            new SelectListItem() {Text="Mushola", Value="Mushola"},
+                            new SelectListItem() {Text="Smoking Area", Value="Smoking Area"},
+                            new SelectListItem() {Text="Rest Area", Value="Rest Area"},
+                            new SelectListItem() {Text="Changing Room", Value="Changing Room"},
+                            new SelectListItem() {Text="Office", Value="Office"},
+                            new SelectListItem() {Text="Window Audit", Value="Window Audit"},
+                            new SelectListItem() {Text="Security Gate", Value="Security Gate"},
+                            new SelectListItem() {Text="Other", Value="Other"},
+                        }, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.FeedbackCheckList.Area, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FeedbackCheckList.Category, htmlAttributes: new { @class = "control-label col-md-12" })
+                    <div class="col-md-11" style="padding:10px;">
+                        @Html.DropDownListFor(x => x.FeedbackCheckList.Category, new List<SelectListItem>
+                        {
+                            new SelectListItem() {Text="Masker", Value="Masker"},
+                            new SelectListItem() {Text="Hand Wash", Value="Hand Wash"},
+                            new SelectListItem() {Text="Physical Distance", Value="Physical Distance"},
+                            new SelectListItem() {Text="Team Segregation", Value="Team Segregation"},
+                            new SelectListItem() {Text="Temparature Check", Value="Temparature Check"},
+                            new SelectListItem() {Text="Other", Value="Other"},
+                        }, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.FeedbackCheckList.Category, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FeedbackCheckList.FeedbackItem, "Feedback Item", htmlAttributes: new { @class = "control-label col-md-12" })
+                    <div class="col-md-11" style="padding:10px;">
+                        @Html.TextAreaFor(model => model.FeedbackCheckList.FeedbackItem, new { @class = "form-control", @rows = 6 })
+                        @Html.ValidationMessageFor(model => model.FeedbackCheckList.FeedbackItem, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FeedbackCheckList.UploadedFile, "Upload File (Max 3 MB)", htmlAttributes: new { @class = "control-label col-md-12" })
+                    <div class="col-md-11" style="padding:10px;">
+                        @Html.TextBoxFor(m => m.FeedbackCheckList.PostedFiles,
+                       new {  type = "file" , accept = ".jpg, .jpeg, .png" , @multiple = "multiple", @class = "fileUpload"})
+                    </div>
+                </div>
+
+            </div>
+
+            <br />
+            <hr />
+            <div class="col-md-10" style="padding: 20px;">
+                <input type="submit" id="submitBtn" value="Submit Audit Result" class="btn btn-success" />
+            </div>
+        </div>
+    }
+
+</div>
+
+<script>
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $(':radio:checked').attr('checked', false);
+
+        $("form").submit(function (e) {
+
+            var allRadioButton = $(":radio").length / 2;
+            var selectedRadioButton = $(':radio:checked').length;
+
+            if (selectedRadioButton < allRadioButton) {
+                e.preventDefault(e);
+                alert("Please complete all of audit checklists!");
+                return false;
+            }
+        });
+
+
+        //binds to onchange event of your input field
+        $('.fileUpload').bind('change', function (event) {
+            var targetId = "#" + event.target.id;
+            var fileLength = $(targetId).get(0).files.length;
+
+            if (fileLength != 0) {
+                for (var i = 0; i < fileLength; i++) {
+                    if (this.files[i].size > 3145728) {
+                        alert("Maximum upload file size is only 3 MB");
+                        $(targetId).replaceWith($(targetId).val('').clone(true))
+                    }
+                }
+            }
+        });
+
+
+
+        var $textareas = jQuery('textarea');
+
+        // set init (default) state   
+        $textareas.data('x', $textareas.outerWidth());
+        $textareas.data('y', $textareas.outerHeight());
+
+        $textareas.mouseup(function () {
+
+            var $this = $(this);
+
+            $this.css('margin', '0');
+        });
+
+
+        $('.falseRadButton').on('change', function (event) {
+            $(this).closest('tr').find('.remark').prop('required', true);
+        });
+
+
+        $('.trueRadButton').on('change', function (event) {
+            $(this).closest('tr').find('.remark').prop('required', false);
+        });
+    });
+</script>

@@ -1,0 +1,111 @@
+﻿@model Covid19_Audit.Viewmodel.Audit_Form.AuditViewModel
+@using Covid19_Audit.Class
+
+@{
+    ViewBag.Title = "View";
+}
+
+<style>
+    .btn-success {
+        background-color: #478f7c !important;
+    }
+
+    .itemTitle {
+        font-weight: bold;
+    }
+</style>
+
+
+<nav id="sidebar">
+    <div class="custom-menu">
+        <button type="button" id="sidebarCollapse" class="btn btn-primary">
+            <i class="fa fa-bars"></i>
+            <span class="sr-only">Toggle Menu</span>
+        </button>
+    </div>
+    <form id="myform">
+        <div class="p-4">
+            <h1><a href="index.html" class="logo">Application Name</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AuditDate, "Audit Date", htmlAttributes: new { @class = "control-label col-md-12" })
+                        <div class="col-md-11" style="padding:10px;">
+                            @Html.EditorFor(model => model.AuditDate, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.AuditDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-12" })
+                        <div class="col-md-11" style="padding:10px;">
+                            @Html.DropDownListFor(x => x.Location, new List<SelectListItem>
+                             {
+                                 new SelectListItem() {Text = "BAT-1", Value="BAT-1"},
+                                 new SelectListItem() {Text = "BAT-2", Value="BAT-2"},
+                             }, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AuditCode, "Audit Code", htmlAttributes: new { @class = "control-label col-md-12" })
+                        <div class="col-md-11" style="padding:10px;">
+                            @Html.DropDownListFor(model => model.AuditCode,
+                         new SelectList(Enum.GetValues(typeof(AuditCodeEnum))),
+                         "Select Audit Code",
+                         new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.AuditCode, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </form>
+
+</nav>
+
+<div id="content" class="p-2 p-md-3 pt-3">
+        <div id="auditChecklist"></div>
+</div>
+
+
+<script>
+
+    $(function () {
+        $('#AuditDate').datetimepicker({
+            format: 'LL'
+        });
+    });
+
+    $(document).ready(function () {
+        $("#AuditCode").change(function () {
+
+            var auditDate = $("#AuditDate").val();
+
+            if (auditDate == "" ) {
+                alert("Please select audit date!")
+                return false;
+            }
+
+
+            var formData = $('#myform').serialize()
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ShowAuditItem", "AuditForm")',
+                data: formData,
+                success: function (result) {
+                    if (result != null) {
+                        $("#auditChecklist").html(result);
+                    }
+                },
+                fail: function (xhr, textStatus, errorThrown) {
+                    alert('request failed');
+                }
+            });
+        });
+    });
+</script>
+
