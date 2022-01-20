@@ -10,7 +10,7 @@ How to install:
 How to run:
 
 1. Insert Badge ID: 12345
-2. Optional to select friend (Suharno)
+2. Required to select friend (Suharno)
 3. Select Audit date, Location, & Audit Code
 4. Start
 
@@ -19,3 +19,13 @@ Technologies:
 1. Language: C#
 2. Framework: ASP.Net MVC, Entity Framework Code First
 3. Pattern: Depedency Injection, MVVM, 
+
+
+Screen Shoot:
+
+1. Home
+![alt text](https://i.postimg.cc/q7F0vyMr/Covid-audit-1.png)
+
+2. Dashboard
+![alt text](https://i.postimg.cc/qRCrhqz3/Covid-audit-2.png)
+
